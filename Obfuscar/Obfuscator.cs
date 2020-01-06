@@ -115,6 +115,30 @@ namespace Obfuscar
             return IsMonoBehaviourDerived(td.BaseType as TypeDefinition);
         }
 
+        bool IsTypeBaseDerived(TypeDefinition td)
+        {
+            if (td == null || td.BaseType == null)
+                return false;
+            else if(td.BaseType.FullName.Contains("TypeBase"))
+            {
+                return true;
+            }
+
+            return IsTypeBaseDerived(td.BaseType as TypeDefinition);
+        }
+
+        bool IsListBaseDerived(TypeDefinition td)
+        {
+            if (td == null || td.BaseType == null)
+                return false;
+            else if (td.BaseType.FullName.Contains("ListBase"))
+            {
+                return true;
+            }
+
+            return IsTypeBaseDerived(td.BaseType as TypeDefinition);
+        }
+
         public void ExportU4KClasses()
         {
             using(StreamWriter writer = File.CreateText("D:/temp/u4k_classes.txt"))
@@ -153,10 +177,20 @@ namespace Obfuscar
                             type.FullName.StartsWith("UnityK12.")
                             )
                         {
-                            if(type.FullName.Contains(".Courseware")
-                                || typeFullName.Contains("GameObjectAPI"))
+                            if(typeFullName.Contains("GameObjectAPI"))
                             {
-                                continue;
+                                if (!IsListBaseDerived(type) && !IsTypeBaseDerived(type))
+                                {
+                                    writer.WriteLine(forceMethodLine);
+                                }
+                                writer.WriteLine(forceFieldLine);
+                            }
+                            else if(typeFullName.Contains(".Courseware"))
+                            {
+                                if (!IsMonoBehaviourDerived(type))
+                                {
+                                    writer.WriteLine(forceFieldLine);
+                                }
                             }
                             else if(typeFullName.Contains("LPUnitMenuWindow")
                                 || typeFullName.Contains("LPWindowV2")

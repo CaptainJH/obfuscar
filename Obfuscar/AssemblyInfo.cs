@@ -1211,6 +1211,11 @@ namespace Obfuscar
                 message = "U4K skip Awake function";
                 return true;
             }
+            else if(md.Name == "AssociatedButton")
+            {
+                message = "U4K skip AssociatedButton function";
+                return true;
+            }
 
             message = "";
             return false;
