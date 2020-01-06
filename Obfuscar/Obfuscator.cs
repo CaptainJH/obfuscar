@@ -152,7 +152,7 @@ namespace Obfuscar
                             continue;
                         }
 
-                        string typeFullName = type.FullName;// type.FullName.Replace('/', '.');
+                        string typeFullName = type.FullName;
                         string forceTypeLine = String.Format("<ForceType name=\"{0}\" forceMethods=\"true\" forceFields=\"true\" />", typeFullName);
                         string forceFieldLine = String.Format("<ForceField type=\"{0}\" rx=\".*\" />", typeFullName);
                         string forceMethodLine = String.Format("<ForceMethod type=\"{0}\" rx=\".*\" />", typeFullName);
