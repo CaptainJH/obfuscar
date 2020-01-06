@@ -863,6 +863,11 @@ namespace Obfuscar
                 }
             }
 
+            if(IsU4KSpecialMethod(method.Method, out message))
+            {
+                return true;
+            }
+
             return ShouldSkipParams(method, map, keepPublicApi, hidePrivateApi, markedOnly, out message);
         }
 
@@ -951,6 +956,11 @@ namespace Obfuscar
         public bool ShouldSkip(FieldKey field, InheritMap map, bool keepPublicApi, bool hidePrivateApi, bool markedOnly,
             out string message)
         {
+            if(IsU4KPublicField(field.Field, out message))
+            {
+                return true;
+            }
+
             // skip runtime methods
             if ((field.Field.IsRuntimeSpecialName && field.Field.Name == "value__"))
             {
@@ -1176,6 +1186,51 @@ namespace Obfuscar
         public override string ToString()
         {
             return Name;
+        }
+
+        bool IsU4KSpecialMethod(MethodDefinition md, out string message)
+        {
+            var match = Regex.Match(md.Name, @"On.+");
+            if (match.Success)
+            {
+                message = "U4K skip On... functions";
+                return true;
+            }
+            else if (md.Name == "Start")
+            {
+                message = "U4K skip Start function";
+                return true;
+            }
+            else if(md.Name == "Update")
+            {
+                message = "U4K skip Update function";
+                return true;
+            }
+            else if(md.Name == "Awake")
+            {
+                message = "U4K skip Awake function";
+                return true;
+            }
+
+            message = "";
+            return false;
+        }
+
+        bool IsU4KPublicField(FieldDefinition fd, out string message)
+        {
+            if (fd.IsPublic())
+            {
+                message = "U4K Skip public field";
+                return true;
+            }
+            else if(fd.HasCustomAttributes)
+            {
+                message = "U4K Skip custom attribute";
+                return true;
+            }
+
+            message = "";
+            return false;
         }
     }
 }

@@ -103,6 +103,83 @@ namespace Obfuscar
             LoadFromReader(reader, null);
         }
 
+        bool IsMonoBehaviourDerived(TypeDefinition td)
+        {
+            if (td == null || td.BaseType == null)
+                return false;
+            else if(td.BaseType.FullName == "UnityEngine.MonoBehaviour")
+            {
+                return true;
+            }
+
+            return IsMonoBehaviourDerived(td.BaseType as TypeDefinition);
+        }
+
+        public void ExportU4KClasses()
+        {
+            using(StreamWriter writer = File.CreateText("D:/temp/u4k_classes.txt"))
+            {
+                foreach (AssemblyInfo info in Project.AssemblyList)
+                {
+                    foreach (TypeDefinition type in info.GetAllTypeDefinitions())
+                    {
+                        if (type.FullName.Contains("<") || type.FullName.Contains("`"))
+                        {
+                            continue;
+                        }
+
+                        string typeFullName = type.FullName;// type.FullName.Replace('/', '.');
+                        string forceTypeLine = String.Format("<ForceType name=\"{0}\" forceMethods=\"true\" forceFields=\"true\" />", typeFullName);
+                        string forceFieldLine = String.Format("<ForceField type=\"{0}\" rx=\".*\" />", typeFullName);
+                        string forceMethodLine = String.Format("<ForceMethod type=\"{0}\" rx=\".*\" />", typeFullName);
+                        if(type.Namespace.Length == 0 && !type.FullName.Contains('.'))
+                        {
+                            if (IsMonoBehaviourDerived(type))
+                            {
+                                writer.WriteLine(forceMethodLine);
+                                writer.WriteLine(forceFieldLine);
+                            }
+                            else
+                            {
+                                writer.WriteLine(forceTypeLine);
+                            }
+                        }
+                        else if
+                            (
+                            type.FullName.StartsWith("U4K.")
+                            || 
+                            type.FullName.StartsWith("UnityEditor.")
+                            || 
+                            type.FullName.StartsWith("UnityK12.")
+                            )
+                        {
+                            if(type.FullName.Contains(".Courseware")
+                                || typeFullName.Contains("GameObjectAPI"))
+                            {
+                                continue;
+                            }
+                            else if(typeFullName.Contains("LPUnitMenuWindow")
+                                || typeFullName.Contains("LPWindowV2")
+                                || typeFullName.Contains("DataModel"))
+                            {
+                                writer.WriteLine(forceMethodLine);
+                                writer.WriteLine(forceFieldLine);
+                            }
+                            else if (IsMonoBehaviourDerived(type))
+                            {
+                                writer.WriteLine(forceMethodLine);
+                                writer.WriteLine(forceFieldLine);
+                            }
+                            else
+                            {
+                                writer.WriteLine(forceTypeLine);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         public void RunRules()
         {
             // The SemanticAttributes of MethodDefinitions have to be loaded before any fields,properties or events are removed
