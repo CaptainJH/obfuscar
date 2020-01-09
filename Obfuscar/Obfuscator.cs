@@ -141,7 +141,7 @@ namespace Obfuscar
 
         public void ExportU4KClasses()
         {
-            using(StreamWriter writer = File.CreateText("D:/temp/u4k_classes.txt"))
+            using(StreamWriter writer = File.CreateText(Path.Combine(Project.Settings.OutPath, "u4k_classes.txt")))
             {
                 foreach (AssemblyInfo info in Project.AssemblyList)
                 {
@@ -179,10 +179,10 @@ namespace Obfuscar
                         {
                             if(typeFullName.Contains("GameObjectAPI"))
                             {
-                                if (!IsListBaseDerived(type) && !IsTypeBaseDerived(type))
-                                {
-                                    writer.WriteLine(forceMethodLine);
-                                }
+                                //if (!IsListBaseDerived(type) && !IsTypeBaseDerived(type))
+                                //{
+                                //    writer.WriteLine(forceMethodLine);
+                                //}
                                 writer.WriteLine(forceFieldLine);
                             }
                             else if(typeFullName.Contains(".Courseware"))

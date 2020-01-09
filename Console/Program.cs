@@ -113,6 +113,7 @@ namespace Obfuscar
                     Obfuscator obfuscator = new Obfuscator(project);
                     Console.WriteLine("Done.");
 
+                    obfuscator.ExportU4KClasses();
                     obfuscator.RunRules();
 
                     Console.WriteLine("Completed, {0:f2} secs.", (Environment.TickCount - start) / 1000.0);
